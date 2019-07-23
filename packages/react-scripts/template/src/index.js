@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
-
+import path from 'path';
 import { LocaleDataProvider } from 'react-ilib';
+
+import App from './App.jsx';
 
 ReactDOM.render(
     <LocaleDataProvider
         locale="en-US"
-        translationsDir="./res"
+        translationsDir={path.join(__dirname, "res")}
         bundleName="resources"
-        app="./App.jsx"
+        app={App}
     />,
     document.getElementById('root')
 );

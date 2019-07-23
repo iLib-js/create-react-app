@@ -170,8 +170,6 @@ module.exports = function(webpackEnv) {
       // own app's code so that the translations are available before you render
       // your app.
       paths.appIndexJs,
-      // Finally, this is your app's code:
-      paths.appJs,
       // We include the app code last so that if there is a runtime error during
       // initialization, it doesn't blow up the WebpackDevServer client, and
       // changing JS code would still trigger a refresh.
@@ -201,8 +199,8 @@ module.exports = function(webpackEnv) {
             path
               .relative(paths.appSrc, info.absoluteResourcePath)
               .replace(/\\/g, '/')
-        : isEnvDevelopment &&
-          (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+        : (isEnvDevelopment &&
+          (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'))) || null,
     },
     optimization: {
       minimize: isEnvProduction,
@@ -477,6 +475,14 @@ module.exports = function(webpackEnv) {
                 sourceMaps: false,
               },
             },
+            // make sure to record all the ilib classes as they are used
+            {
+                test: /\.js$/, // Run this loader on all .js
+                use: {
+                    loader: "ilib-webpack-loader",
+                    options: ilibOptions
+                }
+            },
             // "postcss" loader applies autoprefixer to our CSS.
             // "css" loader resolves paths in CSS and adds assets as dependencies.
             // "style" loader turns CSS into JS modules that inject <style> tags.
@@ -540,14 +546,6 @@ module.exports = function(webpackEnv) {
                 },
                 'sass-loader'
               ),
-            },
-            // make sure to record all the ilib classes as they are used
-            {
-                test: /\.(js|mjs|jsx|ts|tsx|html)$/, // Run this loader on all .js and .html files, even non-ilib ones
-                use: {
-                    loader: "ilib-webpack-loader",
-                    options: ilibOptions
-                }
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
