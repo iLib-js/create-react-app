@@ -65,7 +65,8 @@ const ilibOptions = {
     assembly: "dynamicdata",
     compilation: 'compiled',
     size: 'custom',
-    tempDir: 'assets'
+    tempDir: 'assets',
+    debug: true
 };
 
 // This is the production and development configuration.
@@ -437,6 +438,12 @@ module.exports = function(webpackEnv) {
                 compact: isEnvProduction,
               },
             },
+            // make sure to record all the ilib classes as they are used
+            {
+                test: /\.js$/, // Run this loader on all .js
+                loader: require.resolve("ilib-webpack-loader"),
+                options: ilibOptions
+            },
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
             {
@@ -474,14 +481,6 @@ module.exports = function(webpackEnv) {
                 // being evaluated would be much more helpful.
                 sourceMaps: false,
               },
-            },
-            // make sure to record all the ilib classes as they are used
-            {
-                test: /\.js$/, // Run this loader on all .js
-                use: {
-                    loader: "ilib-webpack-loader",
-                    options: ilibOptions
-                }
             },
             // "postcss" loader applies autoprefixer to our CSS.
             // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -653,12 +652,6 @@ module.exports = function(webpackEnv) {
           };
         },
       }),
-      // Moment.js is an extremely popular library that bundles large locale files
-      // by default due to how Webpack interprets its code. This is a practical
-      // solution that requires the user to opt into importing specific locales.
-      // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
-      // You can remove this if you don't use Moment.js:
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       // Generate a service worker script that will precache, and keep up to date,
       // the HTML & assets that are part of the Webpack build.
       isEnvProduction &&
